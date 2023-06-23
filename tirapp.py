@@ -1,24 +1,18 @@
 import streamlit as st
 import pandas as pd
+import pickle
 
 # Page title
 st.markdown("""
-# Translation Initation Rate Prediction App 
+# Translation Initiation Rate Prediction App
 
-This app allows you to predict Translation Initation Rate in Saccharomyces cerevisiae using Machine Learning methods
+This app allows you to predict Translation Initiation Rate in Saccharomyces cerevisiae using Machine Learning methods.
 
 **Credits**
-- App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad and Dr. Ajeet K. Sharma
+- App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, and Dr. Ajeet K. Sharma
 [[Read the Paper]]().
 ---
 """)
-
-import streamlit as st
-import pandas as pd
-import joblib
-
-# Load the TIR prediction model
-model = joblib.load("tir_rf_model.pkl")
 
 # Function to calculate Kozak Score
 def calculate_kozak_score(sequence):
@@ -46,6 +40,12 @@ def calculate_kozak_score(sequence):
     score += 1
     
     return score
+
+# Load Models
+rf_model_path = "tir_rf_model.pkl"
+
+with open(rf_model_path, 'rb') as f:
+    rf_model = pickle.load(f)
 
 # Streamlit app
 def main():
@@ -84,17 +84,15 @@ def main():
         df["First Letter"] = df["Sequence"].str[50-6].map(encoding)
         df["Fourth Letter"] = df["Sequence"].str[50+3].map(encoding)
 
-        # Predict TIR using the model
-        df['TIR Prediction'] = model.predict(df[['Gene Length', "Length of 5' UTR", 'Kozak Score', 'First Letter', 'Fourth Letter']])
+        # Perform predictions
+        X = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'First Letter', 'Fourth Letter']]
+        df['Translation Initiation Rate (RF)'] = rf_model.predict(X)
 
-        # Save the predicted TIRs to a CSV file
-        df.to_csv("predicted_tirs.csv", index=False)
+        # Save predictions to CSV
+        df.to_csv('predictions.csv', index=False)
 
-        # Print the dataset
+        # Display predictions
         st.write(df)
-        
-        # Provide a download link for the CSV file
-        st.markdown("[Download Predicted TIRs CSV](predicted_tirs.csv)")
     else:
         st.warning("No sequences found.")
 

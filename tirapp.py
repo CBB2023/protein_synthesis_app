@@ -16,9 +16,15 @@ This app allows you to predict Translation Initiation Rate in Saccharomyces cere
 
 # Function to calculate Kozak Score
 def calculate_kozak_score(sequence):
+    if len(sequence) < 9:
+        return 0
+
     koz = sequence[50-6:50] + sequence[50+3:50+6]
     score = 0
-    
+
+    if len(koz) < 9:
+        return 0
+
     if koz[0] == "A" or koz[0] == "U":
         score += 1
     if koz[1] == "A":
@@ -38,7 +44,7 @@ def calculate_kozak_score(sequence):
     if koz[8] == "U" or koz[8] == "C":
         score += 1
     score += 1
-    
+
     return score
 
 # Load Models

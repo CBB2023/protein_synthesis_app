@@ -1,7 +1,18 @@
-
 import streamlit as st
 import pandas as pd
 import pickle
+
+# Page title
+st.markdown("""
+# Translation Initiation Rate Prediction App
+
+This app allows you to predict Translation Initiation Rate in Saccharomyces cerevisiae using Machine Learning methods.
+
+**Credits**
+- App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, and Dr. Ajeet K. Sharma
+[[Read the Paper]]().
+---
+""")
 
 # Function to calculate Kozak Score
 def calculate_kozak_score(sequence):
@@ -16,7 +27,7 @@ def calculate_kozak_score(sequence):
         score += 1
     if koz[3] == "A":
         score += 1
-    if koz[4] == "A" or koz[4] == "C":
+    if koz[4] == "A" or koz[2] == "C":
         score += 1
     if koz[5] == "A":
         score += 1
@@ -38,17 +49,6 @@ with open(rf_model_path, 'rb') as f:
 
 # Streamlit app
 def main():
-    # Page title
-    st.markdown("""
-    # Translation Initiation Rate Prediction App
-    
-    This app allows you to predict Translation Initiation Rate in Saccharomyces cerevisiae using Machine Learning methods.
-    
-    **Credits**
-    - App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, and Dr. Ajeet K. Sharma
-    [[Read the Paper]]().
-    ---
-    """)
     
     # User input
     option = st.radio("Select option:", ("Enter sequence", "Upload .txt file"))
@@ -74,7 +74,11 @@ def main():
         df['Length of 5\' UTR'] = df['Sequence'].apply(lambda seq: seq.index(start_codon) if start_codon in seq else 0)
 
         # Calculate Kozak Score
-        df['Kozak Score'] = df['Sequence'].apply(calculate_kozak_score)
+        kozak_scores = []
+        for sequence in df['Sequence']:
+            kozak_score = calculate_kozak_score(sequence)
+            kozak_scores.append(kozak_score)
+        df['Kozak Score'] = kozak_scores
 
         # Define a dictionary that maps each letter to its corresponding value
         encoding = {"A": 1, "U": 2, "G": 3, "C": 4}

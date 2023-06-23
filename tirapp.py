@@ -9,7 +9,7 @@ st.markdown("""
 This app allows you to predict Translation Initiation Rate in Saccharomyces cerevisiae using Machine Learning methods.
 
 **Credits**
-- App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima and Dr. Ajeet K. Sharma
+- App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima and Ajeet K. Sharma
 [[Read the Paper]]().
 ---
 """)

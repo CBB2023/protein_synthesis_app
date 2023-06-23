@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import pickle
+import base64
 
 # Page title
 st.markdown("""
@@ -9,7 +9,7 @@ st.markdown("""
 This app allows you to predict Translation Initiation Rate in Saccharomyces cerevisiae using Machine Learning methods.
 
 **Credits**
-- App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima and Ajeet K. Sharma
+- App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima, and Dr. Ajeet K. Sharma
 [[Read the Paper]]().
 ---
 """)
@@ -47,11 +47,9 @@ def calculate_kozak_score(sequence):
 
     return score
 
-# Load Models
+# Load Model
 rf_model_path = "tir_rf_model.pkl"
-
-with open(rf_model_path, 'rb') as f:
-    rf_model = pickle.load(f)
+rf_model = pickle.load(open(rf_model_path, 'rb'))
 
 # Streamlit app
 def main():
@@ -93,11 +91,7 @@ def main():
             df['Length of 5\' UTR'] = df['Sequence'].apply(lambda seq: seq.index(start_codon) if start_codon in seq else 0)
 
             # Calculate Kozak Score
-            kozak_scores = []
-            for sequence in df['Sequence']:
-                kozak_score = calculate_kozak_score(sequence)
-                kozak_scores.append(kozak_score)
-            df['Kozak Score'] = kozak_scores
+            df['Kozak Score'] = df['Sequence'].apply(calculate_kozak_score)
 
             # Define a dictionary that maps each letter to its corresponding value
             encoding = {"A": 1, "U": 2, "G": 3, "C": 4}
@@ -106,10 +100,7 @@ def main():
             df["First Letter"] = df["Sequence"].str[50-6].map(encoding)
             df["Fourth Letter"] = df["Sequence"].str[50+3].map(encoding)
 
-            # Perform predictions
             X = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'First Letter', 'Fourth Letter']]
-            df['Initiation Rate'] = rf_model.predict(X)
-
             # Download dataset
             csv = df.to_csv(index=False)
             b64 = base64.b64encode(csv.encode()).decode()
@@ -135,11 +126,7 @@ def main():
             df['Length of 5\' UTR'] = df['Sequence'].apply(lambda seq: seq.index(start_codon) if start_codon in seq else 0)
 
             # Calculate Kozak Score
-            kozak_scores = []
-            for sequence in df['Sequence']:
-                kozak_score = calculate_kozak_score(sequence)
-                kozak_scores.append(kozak_score)
-            df['Kozak Score'] = kozak_scores
+            df['Kozak Score'] = df['Sequence'].apply(calculate_kozak_score)
 
             # Define a dictionary that maps each letter to its corresponding value
             encoding = {"A": 1, "U": 2, "G": 3, "C": 4}

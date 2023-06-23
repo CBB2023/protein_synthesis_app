@@ -15,6 +15,10 @@ This app allows you to predict Translation Initation Rate in Saccharomyces cerev
 
 import streamlit as st
 import pandas as pd
+import joblib
+
+# Load the TIR prediction model
+model = joblib.load("tir_rf_model.pkl")
 
 # Function to calculate Kozak Score
 def calculate_kozak_score(sequence):
@@ -80,8 +84,17 @@ def main():
         df["First Letter"] = df["Sequence"].str[50-6].map(encoding)
         df["Fourth Letter"] = df["Sequence"].str[50+3].map(encoding)
 
+        # Predict TIR using the model
+        df['TIR Prediction'] = model.predict(df[['Gene Length', "Length of 5' UTR", 'Kozak Score', 'First Letter', 'Fourth Letter']])
+
+        # Save the predicted TIRs to a CSV file
+        df.to_csv("predicted_tirs.csv", index=False)
+
         # Print the dataset
         st.write(df)
+        
+        # Provide a download link for the CSV file
+        st.markdown("[Download Predicted TIRs CSV](predicted_tirs.csv)")
     else:
         st.warning("No sequences found.")
 

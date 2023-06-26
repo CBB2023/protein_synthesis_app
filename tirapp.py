@@ -77,7 +77,7 @@ def main():
                 df = pd.DataFrame({'Sequence': [sequence]})
             else:
                 content = uploaded_file.read().decode("utf-8")
-                sequences = content.split("\n")
+                sequences = [line for line in content.split("\n") if not line.startswith('>')]
                 df = pd.DataFrame({'Sequence': sequences})
 
             # Calculate Gene Length

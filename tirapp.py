@@ -9,7 +9,7 @@ st.markdown("""
 This app allows you to predict Translation Initiation Rate in Saccharomyces cerevisiae using Machine Learning methods.
 
 **Credits**
-- App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima, and Dr. Ajeet K. Sharma
+- App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima, and Ajeet K. Sharma
 [[Read the Paper]]().
 ---
 """)
@@ -47,9 +47,6 @@ def calculate_kozak_score(sequence):
 
     return score
 
-# Load Model
-rf_model_path = "tir_rf_model.pkl"
-rf_model = pickle.load(open(rf_model_path, 'rb'))
 
 # Streamlit app
 def main():
@@ -102,41 +99,21 @@ def main():
 
             X = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'First Letter', 'Fourth Letter']]
             # Download dataset
-            csv = df.to_csv(index=False)
+            csv = X.to_csv(index=False)
             b64 = base64.b64encode(csv.encode()).decode()
             href = f'<a href="data:file/csv;base64,{b64}" download="dataset.csv">Download Dataset</a>'
             st.markdown(href, unsafe_allow_html=True)
 
-    # Prediction button
-    if st.button("PREDICT"):
-        if sequence or uploaded_file:
-            # Create DataFrame
-            if sequence:
-                df = pd.DataFrame({'Sequence': [sequence]})
-            else:
-                content = uploaded_file.read().decode("utf-8")
-                sequences = content.split("\n")
-                df = pd.DataFrame({'Sequence': sequences})
 
-            # Calculate Gene Length
-            df['Gene Length'] = df['Sequence'].str.len()
+    # Start Prediction Button
+    if st.button("Start Prediction"):  
+        # Load Models
+        rf_model_path = "tir_rf_model.pkl"
 
-            # Calculate Length of 5' UTR
-            start_codon = 'AUG'
-            df['Length of 5\' UTR'] = df['Sequence'].apply(lambda seq: seq.index(start_codon) if start_codon in seq else 0)
-
-            # Calculate Kozak Score
-            df['Kozak Score'] = df['Sequence'].apply(calculate_kozak_score)
-
-            # Define a dictionary that maps each letter to its corresponding value
-            encoding = {"A": 1, "U": 2, "G": 3, "C": 4}
-
-            # Use the map() function to apply the encoding to the first and fourth letters of each string
-            df["First Letter"] = df["Sequence"].str[50-6].map(encoding)
-            df["Fourth Letter"] = df["Sequence"].str[50+3].map(encoding)
+        with open(rf_model_path, 'rb') as f:
+            rf_model = pickle.load(f)
 
             # Perform predictions
-            X = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'First Letter', 'Fourth Letter']]
             df['Initiation Rate'] = rf_model.predict(X)
 
             # Download predictions

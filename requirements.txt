@@ -3,3 +3,4 @@ seaborn==0.12.0
 pickle5==0.0.11
 scikit-learn==0.24.2
 xgboost==1.7.2
+RNAlib==2.6.2

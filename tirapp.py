@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import RNA
 import base64
 
 # Page title

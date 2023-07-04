@@ -62,6 +62,10 @@ def calculate_folding_energy_80(sequence):
     (ss, mfe) = RNA.fold(sequence_80)
     return "{:.2f}".format(mfe)   
 
+def evaluate_model(model, X_test):
+    y_pred = model.predict(X_test)
+    return y_pred
+
 # Streamlit app
 def main():
     # Title of the dialogue box
@@ -130,22 +134,23 @@ def main():
 
                 # Start Prediction Button
                 if st.button("Start Prediction"):
-                    # Load Model
+                    # Load Models
                     rf_model_path = "tir_rf_model.pkl"
 
                     with open(rf_model_path, 'rb') as f:
                         rf_model = pickle.load(f)
 
-                    df['Initiation Rate'] = rf_model.predict(X)
+                    # Evaluate Random Forest Model
+                    rf_y_pred = evaluate_model(rf_model, df)
                     
                     # Create a DataFrame with predictions
-                    X_predictions = pd.DataFrame({
+                    df_predictions = pd.DataFrame({
                         'Gene Sequence': sequence,
                         'Random Forest Predictions': rf_y_pred 
                     })
 
                     # Provide a download link for predictions
-                    csv = X_predictions.to_csv(index=False)
+                    csv = df_predictions.to_csv(index=False)
                     b64 = base64.b64encode(csv.encode()).decode()  
                     # Convert DataFrame to base64 encoding
                     href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'

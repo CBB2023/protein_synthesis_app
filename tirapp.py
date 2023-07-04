@@ -121,7 +121,7 @@ def main():
                 df["Kozak pos. 1"] = df["Sequence"].str[50-6].map(encoding)
                 df["Kozak pos. 4"] = df["Sequence"].str[50+3].map(encoding)
 
-                X = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'Kozak pos. 1', 'Kozak pos. 4', 'Folding Energy 70', 'Folding Energy 80']]
+                df = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'Kozak pos. 1', 'Kozak pos. 4', 'Folding Energy 70', 'Folding Energy 80']]
                 # Download dataset
                 csv = X.to_csv(index=False)
                 b64 = base64.b64encode(csv.encode()).decode()

@@ -1,4 +1,5 @@
 import streamlit as st
+import pickle
 import pandas as pd
 import RNA
 import base64
@@ -11,7 +12,7 @@ This app allows you to predict Translation Initiation Rate in Saccharomyces cere
 
 **Credits**
 - App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima, and Ajeet K. Sharma
-[[Read the Paper]]().       
+[[Read the Paper]]().
 ---
 """)
 
@@ -48,6 +49,22 @@ def calculate_kozak_score(sequence):
 
     return score
 
+# Function to calculate folding energy of first 70 base pairs
+def calculate_folding_energy_70(sequence):
+    sequence_70 = sequence[:70]
+    (ss, mfe) = RNA.fold(sequence_70)
+    return "{:.2f}".format(mfe)
+
+# Function to calculate folding energy of 40 base pairs left of "AUG" plus 40 base pairs of "AUG"
+def calculate_folding_energy_80(sequence):
+    aug_index = sequence.find("AUG")
+    sequence_80 = sequence[aug_index - 40:aug_index + 43]
+    (ss, mfe) = RNA.fold(sequence_80)
+    return "{:.2f}".format(mfe)
+
+def evaluate_model(model, X):
+    y_pred = model.predict(X)
+    return y_pred    
 
 # Streamlit app
 def main():
@@ -81,47 +98,64 @@ def main():
                 sequences = [line for line in content.split("\n") if not line.startswith('>')]
                 df = pd.DataFrame({'Sequence': sequences})
 
-            # Calculate Gene Length
-            df['Gene Length'] = df['Sequence'].str.len()
+            # Exclude empty sequences
+            df = df[df['Sequence'] != '']
 
-            # Calculate Length of 5' UTR
-            start_codon = 'AUG'
-            df['Length of 5\' UTR'] = df['Sequence'].apply(lambda seq: seq.index(start_codon) if start_codon in seq else 0)
+            if not df.empty:
+                # Calculate Gene Length
+                df['Gene Length'] = df['Sequence'].str.len()
 
-            # Calculate Kozak Score
-            df['Kozak Score'] = df['Sequence'].apply(calculate_kozak_score)
+                # Calculate Length of 5' UTR
+                start_codon = 'AUG'
+                df['Length of 5\' UTR'] = df['Sequence'].apply(lambda seq: seq.index(start_codon) if start_codon in seq else 0)
 
-            # Define a dictionary that maps each letter to its corresponding value
-            encoding = {"A": 1, "U": 2, "G": 3, "C": 4}
+                # Calculate Kozak Score
+                df['Kozak Score'] = df['Sequence'].apply(calculate_kozak_score)
 
-            # Use the map() function to apply the encoding to the first and fourth letters of each string
-            df["First Letter"] = df["Sequence"].str[50-6].map(encoding)
-            df["Fourth Letter"] = df["Sequence"].str[50+3].map(encoding)
+                # Calculate folding energy of first 70 base pairs
+                df['Folding Energy 70'] = df['Sequence'].apply(calculate_folding_energy_70)
 
-            X = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'First Letter', 'Fourth Letter']]
-            # Download dataset
-            csv = X.to_csv(index=False)
-            b64 = base64.b64encode(csv.encode()).decode()
-            href = f'<a href="data:file/csv;base64,{b64}" download="dataset.csv">Download Dataset</a>'
-            st.markdown(href, unsafe_allow_html=True)
+                # Calculate folding energy of 40 base pairs left of "AUG" plus 40 base pairs of "AUG"
+                df['Folding Energy 80'] = df['Sequence'].apply(calculate_folding_energy_80)
 
+                # Define a dictionary that maps each letter to its corresponding value
+                encoding = {"A": 1, "U": 2, "G": 3, "C": 4}
 
-    # Start Prediction Button
-    if st.button("Start Prediction"):  
-        # Load Models
-        rf_model_path = "tir_rf_model.pkl"
+                # Use the map() function to apply the encoding to the first and fourth letters of each string
+                df["Kozak pos. 1"] = df["Sequence"].str[50-6].map(encoding)
+                df["Kozak pos. 4"] = df["Sequence"].str[50+3].map(encoding)
 
-        with open(rf_model_path, 'rb') as f:
-            rf_model = pickle.load(f)
+                X = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'Kozak pos. 1', 'Kozak pos. 4', 'Folding Energy 70', 'Folding Energy 80']]
+                # Download dataset
+                csv = X.to_csv(index=False)
+                b64 = base64.b64encode(csv.encode()).decode()
+                href = f'<a href="data:file/csv;base64,{b64}" download="dataset.csv">Download Dataset</a>'
+                st.markdown(href, unsafe_allow_html=True)
 
-            # Perform predictions
-            df['Initiation Rate'] = rf_model.predict(X)
+                # Start Prediction Button
+                if st.button("Start Prediction"):
+                    # Load Model
+                    rf_model_path = "tir_rf_model.pkl"
 
-            # Download predictions
-            csv = df.to_csv(index=False)
-            b64 = base64.b64encode(csv.encode()).decode()
-            href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'
-            st.markdown(href, unsafe_allow_html=True)
+                    with open(rf_model_path, 'rb') as f:
+                        rf_model = pickle.load(f)
+
+                    # Evaluate Random Forest Model
+                    rf_y_pred = evaluate_model(rf_model, X)
+                    
+                    # Create a DataFrame with predictions
+                    X_predictions = pd.DataFrame({
+                        'Gene Sequence': sequence,
+                        'Random Forest Predictions': rf_y_pred 
+                    })
+
+                    # Provide a download link for predictions
+                    csv = X_predictions.to_csv(index=False)
+                    b64 = base64.b64encode(csv.encode()).decode()  
+                    # Convert DataFrame to base64 encoding
+                    href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'
+                    st.markdown("Download Predictions:")
+                    st.markdown(href, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

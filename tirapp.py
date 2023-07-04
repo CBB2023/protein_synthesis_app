@@ -148,12 +148,6 @@ def main():
                     st.write("No valid sequences found in the uploaded file.")
                     return
 
-            # Download dataset
-            csv = X.to_csv(index=False)
-            b64 = base64.b64encode(csv.encode()).decode()
-            href = f'<a href="data:file/csv;base64,{b64}" download="dataset.csv">Download Dataset</a>'
-            st.markdown(href, unsafe_allow_html=True)
-
     # Start Prediction Button
     if st.button("Start Prediction"):
         if sequence:

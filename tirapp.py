@@ -127,7 +127,7 @@ def main():
 
                 df = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'Kozak pos. 1', 'Kozak pos. 4', 'Folding Energy 70', 'Folding Energy 80']]
                 # Download dataset
-                csv = X.to_csv(index=False)
+                csv = df.to_csv(index=False)
                 b64 = base64.b64encode(csv.encode()).decode()
                 href = f'<a href="data:file/csv;base64,{b64}" download="dataset.csv">Download Dataset</a>'
                 st.markdown(href, unsafe_allow_html=True)

@@ -136,7 +136,7 @@ def main():
     # Start Prediction Button
     if st.button("Start Prediction"):  
         # Load Models
-        rf_model = "tir_rf_model.pkl"
+        rf_model_path = "tir_rf_model.pkl"
        
 
         with open(rf_model_path, 'rb') as f:

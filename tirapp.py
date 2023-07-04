@@ -125,9 +125,9 @@ def main():
                 df["Kozak pos. 1"] = df["Sequence"].str[50-6].map(encoding)
                 df["Kozak pos. 4"] = df["Sequence"].str[50+3].map(encoding)
 
-                df = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'Kozak pos. 1', 'Kozak pos. 4', 'Folding Energy 70', 'Folding Energy 80']]
+                X = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'Kozak pos. 1', 'Kozak pos. 4', 'Folding Energy 70', 'Folding Energy 80']]
                 # Download dataset
-                csv = df.to_csv(index=False)
+                csv = X.to_csv(index=False)
                 b64 = base64.b64encode(csv.encode()).decode()
                 href = f'<a href="data:file/csv;base64,{b64}" download="dataset.csv">Download Dataset</a>'
                 st.markdown(href, unsafe_allow_html=True)
@@ -143,13 +143,14 @@ def main():
             rf_model = pickle.load(f)
 
         # Evaluate Random Forest Model
-        rf_y_pred = evaluate_model(rf_model, df)
+        rf_y_pred = evaluate_model(rf_model, X)
 
 
         # Create a DataFrame with predictions
         df_predictions = pd.DataFrame({
-            'Random Forest Predictions': rf_y_pred,
-            'XGBoost Predictions': xgb_y_pred
+            'Gene Sequence': sequence,
+            'Random Forest Predictions': rf_y_pred
+            
         })
 
         # Provide a download link for predictions

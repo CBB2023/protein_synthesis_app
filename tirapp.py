@@ -133,32 +133,31 @@ def main():
                 st.markdown(href, unsafe_allow_html=True)
 
                 
-        # Start Prediction Button
-         if st.button("Start Prediction"):
-            # Load Models
-            f_model_path = "tir_rf_model.pkl"
+    # Start Prediction Button
+    if st.button("Start Prediction"):  
+        # Load Models
+        rf_model_path = "tir_rf_model.pkl"
+       
 
-            with open(rf_model_path, 'rb') as f:
-                rf_model = pickle.load(f)
+        with open(rf_model_path, 'rb') as f:
+            rf_model = pickle.load(f)
 
-            # Evaluate Random Forest Model
-            rf_y_pred = evaluate_model(rf_model, df)
-                    
-            # Create a DataFrame with predictions
-            df_predictions = pd.DataFrame({
-                'Gene Sequence': sequence,
-                'Random Forest Predictions': rf_y_pred 
-            })
-                    
-                
-            # Provide a download link for predictions
-            csv = df_predictions.to_csv(index=False)
-            b64 = base64.b64encode(csv.encode()).decode()  
-                    
-            # Convert DataFrame to base64 encoding
-            href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'
-            st.markdown("Download Predictions:")
-            st.markdown(href, unsafe_allow_html=True)
+        # Evaluate Random Forest Model
+        rf_y_pred = evaluate_model(rf_model, df)
+
+
+        # Create a DataFrame with predictions
+        df_predictions = pd.DataFrame({
+            'Random Forest Predictions': rf_y_pred,
+            'XGBoost Predictions': xgb_y_pred
+        })
+
+        # Provide a download link for predictions
+        csv = df_predictions.to_csv(index=False)
+        b64 = base64.b64encode(csv.encode()).decode()  # Convert DataFrame to base64 encoding
+        href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'
+        st.markdown("Download Predictions:")
+        st.markdown(href, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

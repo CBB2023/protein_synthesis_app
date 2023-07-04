@@ -60,11 +60,7 @@ def calculate_folding_energy_80(sequence):
     aug_index = sequence.find("AUG")
     sequence_80 = sequence[aug_index - 40:aug_index + 43]
     (ss, mfe) = RNA.fold(sequence_80)
-    return "{:.2f}".format(mfe)
-
-def evaluate_model(model, X):
-    y_pred = model.predict(X)
-    return y_pred    
+    return "{:.2f}".format(mfe)   
 
 # Streamlit app
 def main():
@@ -140,8 +136,7 @@ def main():
                     with open(rf_model_path, 'rb') as f:
                         rf_model = pickle.load(f)
 
-                    # Evaluate Random Forest Model
-                    rf_y_pred = evaluate_model(rf_model, X)
+                    df['Initiation Rate'] = rf_model.predict(X)
                     
                     # Create a DataFrame with predictions
                     X_predictions = pd.DataFrame({

@@ -46,15 +46,15 @@ def calculate_five_prime_utr(sequence):
     else:
         return 0
 
-# Function to calculate 1st position of each Kozak sequence
 def calculate_kozak_pos_1(sequence):
     kozak_start = 50 - 6
-    return sequence[kozak_start]
+    encoding = {"A": 1, "U": 2, "G": 3, "C": 4}
+    return encoding.get(sequence[kozak_start], 0)
 
-# Function to calculate 4th position of each Kozak sequence
 def calculate_kozak_pos_4(sequence):
     kozak_start = 50 + 3
-    return sequence[kozak_start]
+    encoding = {"A": 1, "U": 2, "G": 3, "C": 4}
+    return encoding.get(sequence[kozak_start], 0)
 
 # Function to calculate folding energy of first 70 base pairs
 def calculate_folding_energy_70(sequence):

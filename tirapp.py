@@ -56,6 +56,19 @@ def calculate_kozak_pos_4(sequence):
     kozak_start = 50 + 3
     return sequence[kozak_start]
 
+# Function to calculate folding energy of first 70 base pairs
+def calculate_folding_energy_70(sequence):
+    sequence_70 = sequence[:70]
+    (ss, mfe) = RNA.fold(sequence_70)
+    return "{:.2f}".format(mfe)
+
+# Function to calculate folding energy of 40 base pairs left of "AUG" plus 40 base pairs of "AUG"
+def calculate_folding_energy_80(sequence):
+    aug_index = sequence.find("AUG")
+    sequence_80 = sequence[aug_index - 40:aug_index + 43]
+    (ss, mfe) = RNA.fold(sequence_80)
+    return "{:.2f}".format(mfe)
+
 # Function to calculate features
 def calculate_features(sequence):
     # Create DataFrame
@@ -91,5 +104,89 @@ def calculate_features(sequence):
     else:
         return None
 
-# Rest of the code...
+def evaluate_model(model, X_test):
+    y_pred = model.predict(X_test)
+    return y_pred
 
+# Streamlit app
+def main():
+    # Title of the dialogue box
+    st.subheader("Enter a gene sequence")
+
+    # User input - Text area for entering the sequence
+    sequence = st.text_area("Sequence")
+
+    # Title for uploading file section
+    st.subheader("Or, upload a file")
+
+    # File upload
+    uploaded_file = st.file_uploader("Upload .txt file", type="txt")
+
+    # Display selected file name or "No file selected"
+    if uploaded_file is not None:
+        file_name = uploaded_file.name
+        st.write("Selected file:", file_name)
+    else:
+        file_name = "No file selected"
+
+    # Calculate features button
+    if st.button("Calculate Features"):
+        if sequence or uploaded_file:
+            if sequence:
+                X = calculate_features(sequence)
+            else:
+                content = uploaded_file.read().decode("utf-8")
+                sequences = [line for line in content.split("\n") if not line.startswith('>')]
+                dfs = []
+                for seq in sequences:
+                    df = calculate_features(seq)
+                    if df is not None:
+                        dfs.append(df)
+                if dfs:
+                    X = pd.concat(dfs, ignore_index=True)
+                else:
+                    st.write("No valid sequences found in the uploaded file.")
+                    return
+
+            # Download dataset
+            csv = X.to_csv(index=False)
+            b64 = base64.b64encode(csv.encode()).decode()
+            href = f'<a href="data:file/csv;base64,{b64}" download="dataset.csv">Download Dataset</a>'
+            st.markdown(href, unsafe_allow_html=True)
+
+    # Start Prediction Button
+    if st.button("Start Prediction"):
+        if sequence:
+            X = calculate_features(sequence)
+            if X is None:
+                st.write("Invalid sequence.")
+                return
+        else:
+            st.write("Please enter a gene sequence or upload a file.")
+            return
+
+        # Load Models
+        rf_model_path = "tir_rf_model.pkl"
+
+        with open(rf_model_path, 'rb') as f:
+            rf_model = pickle.load(f)
+
+        # Evaluate Random Forest Model
+        rf_y_pred = evaluate_model(rf_model, X)
+
+        # Create a DataFrame with predictions
+        df_predictions = pd.DataFrame({
+            'Gene Sequence': sequence,
+            'Random Forest Predictions': rf_y_pred
+        })
+
+        # Provide a download link for predictions
+        csv = df_predictions.to_csv(index=False)
+        b64 = base64.b64encode(csv.encode()).decode()  # Convert DataFrame to base64 encoding
+        href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'
+        st.markdown("Download Predictions:")
+        st.markdown(href, unsafe_allow_html=True)
+
+
+if __name__ == "__main__":
+    main()

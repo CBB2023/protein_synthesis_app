@@ -132,35 +132,33 @@ def main():
                 href = f'<a href="data:file/csv;base64,{b64}" download="dataset.csv">Download Dataset</a>'
                 st.markdown(href, unsafe_allow_html=True)
 
-                # Start Prediction Button
-                if st.button("Start Prediction"):
-                    # Load Models
-                    rf_model_path = "tir_rf_model.pkl"
-
-                    with open(rf_model_path, 'rb') as f:
-                        rf_model = pickle.load(f)
-
-                    # Evaluate Random Forest Model
-                    rf_y_pred = evaluate_model(rf_model, df)
-                    
-                    # Create a DataFrame with predictions
-                    df_predictions = pd.DataFrame({
-                        'Gene Sequence': sequence,
-                        'Random Forest Predictions': rf_y_pred 
-                    })
-                    
-                    # Display the predictions DataFrame
-                    st.subheader("Predictions")
-                    st.write(df_predictions)
                 
-                    # Provide a download link for predictions
-                    csv = df_predictions.to_csv(index=False)
-                    b64 = base64.b64encode(csv.encode()).decode()  
+        # Start Prediction Button
+         if st.button("Start Prediction"):
+            # Load Models
+            f_model_path = "tir_rf_model.pkl"
+
+            with open(rf_model_path, 'rb') as f:
+                rf_model = pickle.load(f)
+
+            # Evaluate Random Forest Model
+            rf_y_pred = evaluate_model(rf_model, df)
                     
-                    # Convert DataFrame to base64 encoding
-                    href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'
-                    st.markdown("Download Predictions:")
-                    st.markdown(href, unsafe_allow_html=True)
+            # Create a DataFrame with predictions
+            df_predictions = pd.DataFrame({
+                'Gene Sequence': sequence,
+                'Random Forest Predictions': rf_y_pred 
+            })
+                    
+                
+            # Provide a download link for predictions
+            csv = df_predictions.to_csv(index=False)
+            b64 = base64.b64encode(csv.encode()).decode()  
+                    
+            # Convert DataFrame to base64 encoding
+            href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'
+            st.markdown("Download Predictions:")
+            st.markdown(href, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

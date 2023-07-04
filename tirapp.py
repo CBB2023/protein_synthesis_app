@@ -148,10 +148,15 @@ def main():
                         'Gene Sequence': sequence,
                         'Random Forest Predictions': rf_y_pred 
                     })
-
+                    
+                    # Display the predictions DataFrame
+                    st.subheader("Predictions")
+                    st.write(df_predictions)
+                
                     # Provide a download link for predictions
                     csv = df_predictions.to_csv(index=False)
                     b64 = base64.b64encode(csv.encode()).decode()  
+                    
                     # Convert DataFrame to base64 encoding
                     href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'
                     st.markdown("Download Predictions:")

@@ -62,6 +62,43 @@ def calculate_folding_energy_80(sequence):
     (ss, mfe) = RNA.fold(sequence_80)
     return "{:.2f}".format(mfe)   
 
+# Function to calculate features and generate dataset
+def calculate_features_and_generate_dataset(sequence):
+    # Create DataFrame
+    df = pd.DataFrame({'Sequence': [sequence]})
+    
+    # Exclude empty sequences
+    df = df[df['Sequence'] != '']
+
+    if not df.empty:
+        # Calculate Gene Length
+        df['Gene Length'] = df['Sequence'].str.len()
+
+        # Calculate Length of 5' UTR
+        start_codon = 'AUG'
+        df['Length of 5\' UTR'] = df['Sequence'].apply(lambda seq: seq.index(start_codon) if start_codon in seq else 0)
+
+        # Calculate Kozak Score
+        df['Kozak Score'] = df['Sequence'].apply(calculate_kozak_score)
+
+        # Calculate folding energy of first 70 base pairs
+        df['Folding Energy 70'] = df['Sequence'].apply(calculate_folding_energy_70)
+
+        # Calculate folding energy of 40 base pairs left of "AUG" plus 40 base pairs of "AUG"
+        df['Folding Energy 80'] = df['Sequence'].apply(calculate_folding_energy_80)
+
+        # Define a dictionary that maps each letter to its corresponding value
+        encoding = {"A": 1, "U": 2, "G": 3, "C": 4}
+
+        # Use the map() function to apply the encoding to the first and fourth letters of each string
+        df["Kozak pos. 1"] = df["Sequence"].str[50-6].map(encoding)
+        df["Kozak pos. 4"] = df["Sequence"].str[50+3].map(encoding)
+
+        X = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'Kozak pos. 1', 'Kozak pos. 4', 'Folding Energy 70', 'Folding Energy 80']]
+        return X
+    else:
+        return None
+
 def evaluate_model(model, X_test):
     y_pred = model.predict(X_test)
     return y_pred
@@ -90,54 +127,41 @@ def main():
     # Calculate features and generate dataset button
     if st.button("Calculate Features and Generate Dataset"):
         if sequence or uploaded_file:
-            # Create DataFrame
             if sequence:
-                df = pd.DataFrame({'Sequence': [sequence]})
+                X = calculate_features_and_generate_dataset(sequence)
             else:
                 content = uploaded_file.read().decode("utf-8")
                 sequences = [line for line in content.split("\n") if not line.startswith('>')]
-                df = pd.DataFrame({'Sequence': sequences})
+                dfs = []
+                for seq in sequences:
+                    df = calculate_features_and_generate_dataset(seq)
+                    if df is not None:
+                        dfs.append(df)
+                if dfs:
+                    X = pd.concat(dfs, ignore_index=True)
+                else:
+                    st.write("No valid sequences found in the uploaded file.")
+                    return
 
-            # Exclude empty sequences
-            df = df[df['Sequence'] != '']
+            # Download dataset
+            csv = X.to_csv(index=False)
+            b64 = base64.b64encode(csv.encode()).decode()
+            href = f'<a href="data:file/csv;base64,{b64}" download="dataset.csv">Download Dataset</a>'
+            st.markdown(href, unsafe_allow_html=True)
 
-            if not df.empty:
-                # Calculate Gene Length
-                df['Gene Length'] = df['Sequence'].str.len()
-
-                # Calculate Length of 5' UTR
-                start_codon = 'AUG'
-                df['Length of 5\' UTR'] = df['Sequence'].apply(lambda seq: seq.index(start_codon) if start_codon in seq else 0)
-
-                # Calculate Kozak Score
-                df['Kozak Score'] = df['Sequence'].apply(calculate_kozak_score)
-
-                # Calculate folding energy of first 70 base pairs
-                df['Folding Energy 70'] = df['Sequence'].apply(calculate_folding_energy_70)
-
-                # Calculate folding energy of 40 base pairs left of "AUG" plus 40 base pairs of "AUG"
-                df['Folding Energy 80'] = df['Sequence'].apply(calculate_folding_energy_80)
-
-                # Define a dictionary that maps each letter to its corresponding value
-                encoding = {"A": 1, "U": 2, "G": 3, "C": 4}
-
-                # Use the map() function to apply the encoding to the first and fourth letters of each string
-                df["Kozak pos. 1"] = df["Sequence"].str[50-6].map(encoding)
-                df["Kozak pos. 4"] = df["Sequence"].str[50+3].map(encoding)
-
-                X = df[['Gene Length', 'Length of 5\' UTR', 'Kozak Score', 'Kozak pos. 1', 'Kozak pos. 4', 'Folding Energy 70', 'Folding Energy 80']]
-                # Download dataset
-                csv = X.to_csv(index=False)
-                b64 = base64.b64encode(csv.encode()).decode()
-                href = f'<a href="data:file/csv;base64,{b64}" download="dataset.csv">Download Dataset</a>'
-                st.markdown(href, unsafe_allow_html=True)
-
-                
     # Start Prediction Button
-    if st.button("Start Prediction"):  
+    if st.button("Start Prediction"):
+        if sequence:
+            X = calculate_features_and_generate_dataset(sequence)
+            if X is None:
+                st.write("Invalid sequence.")
+                return
+        else:
+            st.write("Please enter a gene sequence or upload a file.")
+            return
+
         # Load Models
         rf_model_path = "tir_rf_model.pkl"
-       
 
         with open(rf_model_path, 'rb') as f:
             rf_model = pickle.load(f)
@@ -145,12 +169,10 @@ def main():
         # Evaluate Random Forest Model
         rf_y_pred = evaluate_model(rf_model, X)
 
-
         # Create a DataFrame with predictions
         df_predictions = pd.DataFrame({
             'Gene Sequence': sequence,
             'Random Forest Predictions': rf_y_pred
-            
         })
 
         # Provide a download link for predictions

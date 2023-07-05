@@ -117,8 +117,6 @@ def main():
         if sequence or uploaded_file:
             if sequence:
                 X = calculate_features(sequence)
-            elif uploaded_file:
-                X = calculate_features(uploaded_file)
             else:
                 st.write("No valid sequences found.")
                 return

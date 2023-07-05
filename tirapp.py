@@ -53,9 +53,9 @@ def calculate_folding_energy_80(sequence):
 def calculate_features(sequence):
     if sequence or uploaded_file:
     # Create DataFrame
-    if sequence:
+      if sequence:
         df = pd.DataFrame({'Sequence': [sequence]})
-    else:
+      else:
         content = uploaded_file.read().decode("utf-8")
         sequences = [line for line in content.split("\n") if not line.startswith('>')]
         df = pd.DataFrame({'Sequence': sequences})

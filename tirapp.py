@@ -64,9 +64,6 @@ def calculate_features(sequence):
         # Calculate Length of 5' UTR
         df['Length of 5\' UTR'] = df['Sequence'].apply(calculate_five_prime_utr)
 
-        # Calculate CDS length
-        df['CDS Length'] = df['Sequence'].apply(calculate_cds)
-
         # Calculate Kozak pos. 1
         df['Kozak pos. 1'] = df['Sequence'].apply(calculate_kozak_pos_1)
 

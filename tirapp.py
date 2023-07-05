@@ -16,26 +16,6 @@ This app allows you to predict Translation Initiation Rate in Saccharomyces cere
 ---
 """)
 
-# Function to calculate CDS length
-def calculate_cds(sequence):
-    start_codon = 'AUG'
-    stop_codons = ['UAA', 'UAG', 'UGA']
-
-    cds_start = sequence.find(start_codon)
-    cds_end = -1
-
-    for i in range(cds_start + len(start_codon), len(sequence), 3):
-        codon = sequence[i:i + 3]
-        if codon in stop_codons:
-            cds_end = i + len(codon)
-            break
-
-    if cds_start != -1 and cds_end != -1:
-        cds_length = cds_end - cds_start
-    else:
-        cds_length = 0
-
-    return cds_length
 
 # Function to calculate Length of 5' UTR
 def calculate_five_prime_utr(sequence):

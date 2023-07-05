@@ -144,6 +144,8 @@ def main():
                         dfs.append(df)
                 if dfs:
                     X = pd.concat(dfs, ignore_index=True)
+                    st.write("Calculated Features:")
+                    st.write(X)  # Print the calculated features dataset X
                 else:
                     st.write("No valid sequences found in the uploaded file.")
                     return
@@ -174,6 +176,9 @@ def main():
             'Random Forest Predictions': rf_y_pred
         })
 
+        # Display the predictions
+        st.write("Prediction Results:")
+        st.write(df_predictions)
 
 if __name__ == "__main__":
     main()

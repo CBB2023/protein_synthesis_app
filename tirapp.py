@@ -51,8 +51,14 @@ def calculate_folding_energy_80(sequence):
 
 # Function to calculate features
 def calculate_features(sequence):
+    if sequence or uploaded_file:
     # Create DataFrame
-    df = pd.DataFrame({'Sequence': [sequence]})
+    if sequence:
+        df = pd.DataFrame({'Sequence': [sequence]})
+    else:
+        content = uploaded_file.read().decode("utf-8")
+        sequences = [line for line in content.split("\n") if not line.startswith('>')]
+        df = pd.DataFrame({'Sequence': sequences})
     
     # Exclude empty sequences
     df = df[df['Sequence'] != '']
@@ -112,20 +118,8 @@ def main():
             if sequence:
                 X = calculate_features(sequence)
             else:
-                content = uploaded_file.read().decode("utf-8")
-                sequences = [line for line in content.split("\n") if not line.startswith('>')]
-                dfs = []
-                for seq in sequences:
-                    df = calculate_features(seq)
-                    if df is not None:
-                        dfs.append(df)
-                if dfs:
-                    X = pd.concat(dfs, ignore_index=True)
-                    st.write("Calculated Features:")
-                    st.write(X)  # Print the calculated features dataset X
-                else:
-                    st.write("No valid sequences found in the uploaded file.")
-                    return
+                st.write("No valid sequences found in the uploaded file.")
+                return
 
     # Start Prediction Button
     if st.button("Start Prediction"):

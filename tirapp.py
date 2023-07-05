@@ -156,7 +156,7 @@ def main():
                 st.write("Invalid sequence.")
                 return
         else:
-            st.write("Please enter a gene sequence or upload a file.")
+            st.write("No sequence available")
             return
 
         # Load Models
@@ -173,13 +173,6 @@ def main():
             'Gene Sequence': sequence,
             'Random Forest Predictions': rf_y_pred
         })
-
-        # Provide a download link for predictions
-        csv = df_predictions.to_csv(index=False)
-        b64 = base64.b64encode(csv.encode()).decode()  # Convert DataFrame to base64 encoding
-        href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'
-        st.markdown("Download Predictions:")
-        st.markdown(href, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

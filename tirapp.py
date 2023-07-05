@@ -118,7 +118,7 @@ def main():
             if sequence:
                 X = calculate_features(sequence)
             else:
-                st.write("No valid sequences found in the uploaded file.")
+                st.write("No valid sequences found.")
                 return
 
     # Start Prediction Button

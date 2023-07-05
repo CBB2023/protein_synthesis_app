@@ -58,8 +58,8 @@ def calculate_features(sequence):
     df = df[df['Sequence'] != '']
 
     if not df.empty:
-        # Calculate Gene Length
-        df['Gene Length'] = df['Sequence'].str.len()
+        # Calculate CDS Length
+        df['CDS Length'] = df['Sequence'].str.len()
 
         # Calculate Length of 5' UTR
         df['Length of 5\' UTR'] = df['Sequence'].apply(calculate_five_prime_utr)
@@ -76,7 +76,7 @@ def calculate_features(sequence):
         # Calculate folding energy of 40 base pairs left of "AUG" plus 40 base pairs of "AUG"
         df['Folding Energy 80'] = df['Sequence'].apply(calculate_folding_energy_80)
 
-        X = df[['Gene Length', 'Length of 5\' UTR', 'Kozak pos. 1', 'Kozak pos. 4', 'Folding Energy 70', 'Folding Energy 80']]
+        X = df[['CDS Length', 'Length of 5\' UTR', 'Kozak pos. 1', 'Kozak pos. 4', 'Folding Energy 70', 'Folding Energy 80']]
         return X
     else:
         return None

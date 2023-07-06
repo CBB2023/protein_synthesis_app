@@ -47,7 +47,7 @@ def calculate_features(sequence, start_codon, stop_codon):
 
         if not df.empty:
             df['CDS Length'] = stop_codon - start_codon
-            df['Length of 5\' UTR'] = df['Sequence'].apply(lambda seq: seq.index(start_codon) if start_codon in seq else 0)
+            df['Length of 5\' UTR'] = df['Sequence'].apply(lambda x: calculate_five_prime_utr(x, start_codon))
             df['Kozak pos. 1'] = df['Sequence'].apply(lambda x: calculate_kozak_pos_1(x, start_codon - 6))
             df['Kozak pos. 4'] = df['Sequence'].apply(lambda x: calculate_kozak_pos_4(x, start_codon - 3))
             df['Folding Energy 70'] = df['Sequence'].apply(calculate_folding_energy_70)

@@ -72,13 +72,13 @@ def main():
         This app allows you to predict Translation Initiation Rate in Saccharomyces cerevisiae using Machine Learning methods.
         
         **Credits**
-        - App built in `Python` + `Streamlit` by Sulagno Chakraborty,Inayat Ullah Irshad, Mahima, and Ajeet K. Sharma
+        - Appbuilt in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima, and Ajeet K. Sharma
         [[Read the Paper]]().
         ---
         """
     )
 
-    col1, col2 = st.beta_columns(2)
+    col1, col2 = st.columns(2)
     sequence = col1.text_area("Enter the sequence:")
     start_codon = col2.text_input("Start Codon Position:")
     stop_codon = col2.text_input("Stop Codon Position:")

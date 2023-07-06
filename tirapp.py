@@ -9,7 +9,7 @@ def calculate_five_prime_utr(sequence, start_codon):
     if start_codon in sequence:
         return sequence.index(start_codon)
     else:
-        return len(sequence)
+        return 0
 
 
 def calculate_kozak_pos_1(sequence, kozak_start):

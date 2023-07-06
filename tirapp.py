@@ -5,6 +5,7 @@ import RNA
 
 
 def calculate_five_prime_utr(sequence, start_codon):
+    start_codon = str(start_codon)
     if start_codon in sequence:
         return sequence.index(start_codon)
     else:
@@ -78,6 +79,8 @@ def main():
         """
     )
 
+    start_codon = 'AUG'
+    stop_codon = 'UAA'or 'UAG' or 'UGA'
     sequences = []
     start_codons = []
     stop_codons = []

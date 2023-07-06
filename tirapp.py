@@ -6,10 +6,9 @@ import RNA
 
 def calculate_five_prime_utr(sequence, start_codon):
     if start_codon in sequence:
-        utr_length = sequence.index(start_codon)
-        return utr_length
+        return sequence.index(start_codon)
     else:
-        return 0
+        return len(sequence)
 
 
 def calculate_kozak_pos_1(sequence, kozak_start):
@@ -47,7 +46,7 @@ def calculate_features(sequence, start_codon, stop_codon):
 
         if not df.empty:
             df['CDS Length'] = stop_codon - start_codon
-            df['Length of 5\' UTR'] = df['Sequence'].apply(lambda x: calculate_five_prime_utr(x, str(start_codon)))
+            df['Length of 5\' UTR'] = df['Sequence'].apply(lambda x: calculate_five_prime_utr(x, start_codon))
             df['Kozak pos. 1'] = df['Sequence'].apply(lambda x: calculate_kozak_pos_1(x, start_codon - 6))
             df['Kozak pos. 4'] = df['Sequence'].apply(lambda x: calculate_kozak_pos_4(x, start_codon + 3))
             df['Folding Energy 70'] = df['Sequence'].apply(calculate_folding_energy_70)
@@ -73,7 +72,7 @@ def main():
         This app allows you to predict Translation Initiation Rate in Saccharomyces cerevisiae using Machine Learning methods.
         
         **Credits**
-        - Appbuilt in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima, and Ajeet K. Sharma
+        - App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima, and Ajeet K. Sharma
         [[Read the Paper]]().
         ---
         """

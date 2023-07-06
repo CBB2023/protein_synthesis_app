@@ -49,7 +49,7 @@ def calculate_features(sequence, start_codon, stop_codon):
             df['CDS Length'] = stop_codon - start_codon
             df['Length of 5\' UTR'] = df['Sequence'].apply(lambda x: calculate_five_prime_utr(x, start_codon))
             df['Kozak pos. 1'] = df['Sequence'].apply(lambda x: calculate_kozak_pos_1(x, start_codon - 6))
-            df['Kozak pos. 4'] = df['Sequence'].apply(lambda x: calculate_kozak_pos_4(x, start_codon + 3))
+            df['Kozak pos. 4'] = df['Sequence'].apply(lambda x: calculate_kozak_pos_4(x, start_codon - 3))
             df['Folding Energy 70'] = df['Sequence'].apply(calculate_folding_energy_70)
             df['Folding Energy 80'] = df['Sequence'].apply(lambda x: calculate_folding_energy_80(x, start_codon))
             df['in_frame AUG'] = df['Sequence'].apply(lambda x: calculate_in_frame_aug(x, start_codon, stop_codon))

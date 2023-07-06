@@ -6,7 +6,8 @@ import RNA
 
 def calculate_five_prime_utr(sequence, start_codon):
     if start_codon in sequence:
-        return sequence.index(start_codon)
+        utr_length = sequence.index(start_codon)
+        return utr_length
     else:
         return 0
 

@@ -3,14 +3,14 @@ import pickle
 import pandas as pd
 import RNA
 
-"""
+
 def calculate_five_prime_utr(sequence, start_codon):
     start_codon = str(start_codon)
     if start_codon in sequence:
         return sequence.index(start_codon)
     else:
         return 0
-"""
+
 
 def calculate_kozak_pos_1(sequence, kozak_start):
     encoding = {"A": 1, "U": 2, "G": 3, "C": 4}
@@ -47,8 +47,6 @@ def calculate_features(sequence, start_codon, stop_codon):
 
         if not df.empty:
             df['CDS Length'] = stop_codon - start_codon
-            start_codon = str(start_codon)
-            #df['Length of 5\' UTR'] = df['Sequence'].apply(lambda x: calculate_five_prime_utr(x, start_codon))
             df['Length of 5\' UTR'] = df['Sequence'].apply(lambda seq: seq.index(start_codon) if start_codon in seq else 0)
             df['Kozak pos. 1'] = df['Sequence'].apply(lambda x: calculate_kozak_pos_1(x, start_codon - 6))
             df['Kozak pos. 4'] = df['Sequence'].apply(lambda x: calculate_kozak_pos_4(x, start_codon - 3))

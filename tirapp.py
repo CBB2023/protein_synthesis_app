@@ -46,7 +46,7 @@ def calculate_features(sequence, start_codon, stop_codon):
 
         if not df.empty:
             df['CDS Length'] = stop_codon - start_codon
-            df['Length of 5\' UTR'] = df['Sequence'].apply(lambda x: calculate_five_prime_utr(x, start_codon))
+            df['Length of 5\' UTR'] = df['Sequence'].apply(lambda x: calculate_five_prime_utr(x, str(start_codon)))
             df['Kozak pos. 1'] = df['Sequence'].apply(lambda x: calculate_kozak_pos_1(x, start_codon - 6))
             df['Kozak pos. 4'] = df['Sequence'].apply(lambda x: calculate_kozak_pos_4(x, start_codon + 3))
             df['Folding Energy 70'] = df['Sequence'].apply(calculate_folding_energy_70)
@@ -72,15 +72,16 @@ def main():
         This app allows you to predict Translation Initiation Rate in Saccharomyces cerevisiae using Machine Learning methods.
         
         **Credits**
-        - App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima, and Ajeet K. Sharma
+        - App built in `Python` + `Streamlit` by Sulagno Chakraborty,Inayat Ullah Irshad, Mahima, and Ajeet K. Sharma
         [[Read the Paper]]().
         ---
         """
     )
 
-    sequence = st.text_area("Enter the sequence:")
-    start_codon = st.text_input("Start Codon Position:")
-    stop_codon = st.text_input("Stop Codon Position:")
+    col1, col2 = st.beta_columns(2)
+    sequence = col1.text_area("Enter the sequence:")
+    start_codon = col2.text_input("Start Codon Position:")
+    stop_codon = col2.text_input("Stop Codon Position:")
 
     calculate_features_button = st.button("Calculate Features")
     predict_button = st.button("Predict")

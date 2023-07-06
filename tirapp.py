@@ -40,6 +40,10 @@ def calculate_in_frame_aug(sequence, start_codon, stop_codon):
 
 
 def calculate_features(sequence, start_codon, stop_codon):
+    
+    start_codon = "AUG"
+    stop_codon = "UAG", "UAA", "UGA"
+    
     if sequence:
         df = pd.DataFrame({'Sequence': [sequence]})
         df = df[df['Sequence'] != '']

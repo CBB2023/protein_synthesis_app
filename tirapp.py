@@ -78,48 +78,83 @@ def main():
         """
     )
 
-    col1, col2 = st.columns(2)
-    sequence = col1.text_area("Enter the sequence:")
-    start_codon = col2.text_input("Start Codon Position:")
-    stop_codon = col2.text_input("Stop Codon Position:")
+    sequences = []
+    start_codons = []
+    stop_codons = []
+
+    num_sequences = st.number_input("Number of Sequences", min_value=1, step=1, value=1)
+
+    for i in range(num_sequences):
+        col1, col2 = st.columns(2)
+        sequence = col1.text_area(f"Sequence {i+1}")
+        start_codon = col2.text_input(f"Start Codon Position {i+1}")
+        stop_codon = col2.text_input(f"Stop Codon Position {i+1}")
+
+        sequences.append(sequence)
+        start_codons.append(start_codon)
+        stop_codons.append(stop_codon)
 
     calculate_features_button = st.button("Calculate Features")
     predict_button = st.button("Predict")
 
     if calculate_features_button:
-        if sequence and start_codon and stop_codon:
-            try:
-                start_codon = int(start_codon)
-                stop_codon = int(stop_codon)
+        df = pd.DataFrame()
+        for sequence, start_codon, stop_codon in zip(sequences, start_codons, stop_codons):
+            if sequence and start_codon and stop_codon:
+                try:
+                    start_codon = int(start_codon)
+                    stop_codon = int(stop_codon)
 
-                X = calculate_features(sequence, start_codon, stop_codon)
+                    X = calculate_features(sequence, start_codon, stop_codon)
 
-                if X is not None:
-                    st.subheader("Calculated Features:")
-                    st.write(X)
-                else:
-                    st.write("Invalid sequence or codon positions. Please enter valid values.")
-            except ValueError:
-                st.write("Invalid input. Please enter numeric values for codon positions.")
+                    if X is not None:
+                        df = pd.concat([df, X])
+                    else:
+                        st.write(f"Invalid sequence or codon positions for Sequence {i+1}. "
+                                 f"Please enter valid values.")
+
+                except ValueError:
+                    st.write(f"Invalid input for codon positions for Sequence {i+1}. "
+                             f"Please enter numeric values.")
+            else:
+                st.write(f"Incomplete input for Sequence {i+1}. Please enter sequence and codon positions.")
+
+        if not df.empty:
+            st.subheader("Calculated Features:")
+            st.write(df)
+        else:
+            st.write("No valid sequences found. Please enter valid values for all sequences.")
 
     if predict_button:
-        if sequence and start_codon and stop_codon:
-            try:
-                start_codon = int(start_codon)
-                stop_codon = int(stop_codon)
+        df = pd.DataFrame()
+        for sequence, start_codon, stop_codon in zip(sequences, start_codons, stop_codons):
+            if sequence and start_codon and stop_codon:
+                try:
+                    start_codon = int(start_codon)
+                    stop_codon = int(stop_codon)
 
-                X = calculate_features(sequence, start_codon, stop_codon)
+                    X = calculate_features(sequence, start_codon, stop_codon)
 
-                if X is not None:
-                    model = pickle.load(open("tir_rf_model.pkl", "rb"))
-                    predictions = evaluate_model(model, X)
+                    if X is not None:
+                        df = pd.concat([df, X])
+                    else:
+                        st.write(f"Invalid sequence or codon positions for Sequence {i+1}. "
+                                 f"Please enter valid values.")
 
-                    st.subheader("Predictions:")
-                    st.write(predictions)
-                else:
-                    st.write("Invalid sequence or codon positions. Please enter valid values.")
-            except ValueError:
-                st.write("Invalid input. Please enter numeric values for codon positions.")
+                except ValueError:
+                    st.write(f"Invalid input for codon positions for Sequence {i+1}. "
+                             f"Please enter numeric values.")
+            else:
+                st.write(f"Incomplete input for Sequence {i+1}. Please enter sequence and codon positions.")
+
+        if not df.empty:
+            model = pickle.load(open("tir_rf_model.pkl", "rb"))
+            predictions = evaluate_model(model, df)
+
+            st.subheader("Predictions:")
+            st.write(predictions)
+        else:
+            st.write("No valid sequences found. Please enter valid values for all sequences.")
 
 
 if __name__ == "__main__":

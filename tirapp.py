@@ -2,7 +2,6 @@ import streamlit as st
 import pickle
 import pandas as pd
 import RNA
-import base64
 
 
 def calculate_five_prime_utr(sequence, start_codon):
@@ -74,7 +73,7 @@ def main():
         
         **Credits**
         - App built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima, and Ajeet K. Sharma
-        [[Read the Paper]]().
+        [[Readthe Paper]]().
         ---
         """
     )
@@ -83,27 +82,43 @@ def main():
     start_codon = st.text_input("Enter the position of the Start codon:")
     stop_codon = st.text_input("Enter the position of the Stop codon:")
 
-    if sequence and start_codon and stop_codon:
-        try:
-            start_codon = int(start_codon)
-            stop_codon = int(stop_codon)
+    calculate_features_button = st.button("Calculate Features")
+    predict_button = st.button("Predict")
 
-            X = calculate_features(sequence, start_codon, stop_codon)
+    if calculate_features_button:
+        if sequence and start_codon and stop_codon:
+            try:
+                start_codon = int(start_codon)
+                stop_codon = int(stop_codon)
 
-            if X is not None:
-                st.subheader("Calculated Features:")
-                st.write(X)
+                X = calculate_features(sequence, start_codon, stop_codon)
 
-                model = pickle.load(open("tir_rf_model.pkl", "rb"))
+                if X is not None:
+                    st.subheader("Calculated Features:")
+                    st.write(X)
+                else:
+                    st.write("Invalid sequence or codon positions. Please enter valid values.")
+            except ValueError:
+                st.write("Invalid input. Please enter numeric values for codon positions.")
 
-                predictions = evaluate_model(model, X)
+    if predict_button:
+        if sequence and start_codon and stop_codon:
+            try:
+                start_codon = int(start_codon)
+                stop_codon = int(stop_codon)
 
-                st.subheader("Predictions:")
-                st.write(predictions)
-            else:
-                st.write("Invalid sequence or codon positions. Please enter valid values.")
-        except ValueError:
-            st.write("Invalid input. Please enter numeric values for codon positions.")
+                X = calculate_features(sequence, start_codon, stop_codon)
+
+                if X is not None:
+                    model = pickle.load(open("tir_rf_model.pkl", "rb"))
+                    predictions = evaluate_model(model, X)
+
+                    st.subheader("Predictions:")
+                    st.write(predictions)
+                else:
+                    st.write("Invalid sequence or codon positions. Please enter valid values.")
+            except ValueError:
+                st.write("Invalid input. Please enter numeric values for codon positions.")
 
 
 if __name__ == "__main__":

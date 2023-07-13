@@ -23,8 +23,8 @@ def main():
     st.subheader("Calculated Features:")
     st.write(df)
 
-  # Start Prediction Button
-    if st.button("Start Prediction"):  
+# Start Prediction Button
+  if st.button("Start Prediction"):  
         # Load Models
         rf_model_path = "tir_rf_model.pkl"
 

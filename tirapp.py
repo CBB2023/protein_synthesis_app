@@ -12,7 +12,7 @@ def evaluate_model(model, X_test):
 
 def main():
   gene_sequence = st.text_input("Enter the mRNA sequence:")
-  start_codon = st.text_input("Enter the start codon position:")
+  start_codon = st.number_input("Enter the start codon position:")
   stop_codons = st.text_input("Enter the stop codons:")
 
   if st.button("Calculate features"):

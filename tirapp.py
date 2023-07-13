@@ -24,7 +24,7 @@ def main():
     st.write(df)
 
   # Start Prediction Button
-  if st.button("Start Prediction"):  
+    if st.button("Start Prediction"):  
         # Load Models
         rf_model_path = "tir_rf_model.pkl"
 

@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-import RandomForest Regressor
+from sklearn.ensemble import RandomForestRegressor
 import RNA
 import pickle
 import features

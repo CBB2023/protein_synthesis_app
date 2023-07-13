@@ -12,6 +12,8 @@ def features(gene_sequence, start_codon_index, stop_codon_index):
     else:
         return None
     gene_length = len(cds_sequence)
+    if gene_length % 3 != 0:
+        print ("Please make sure coding sequence is in triplets")
     folding_energy_80 = calculate_folding_energy_80(gene_sequence,start_codon_index)
     folding_energy_70 = calculate_folding_energy_70(gene_sequence)
     length_of_5prime_utr = len(gene_sequence[:start_codon_index])
@@ -86,8 +88,8 @@ def calculate_in_frame_AUG(cds_sequence):
     return num_in_frame_aug
 
 if __name__ == "__main__":
-    gene_sequence = "CACCAGGUUUUUGGCUUUUUAGAUUUUAUCCCCUUCCAGCAUGAGGAUUGGCACGGAUGCUAACGUGAUAAUCUUGGCUGUAG"
+    gene_sequence = "CACCAGGUUUUUGGCUUUUUAGAUUUUAUCCCCUUCCAGCAUGAGGAUUGGCACGGAUGCUAACGUGAUAAUCUGGCUGUAG"
     start_codon_index = 40
-    stop_codon_index = 80
+    stop_codon_index = 79
     gene_features = features(gene_sequence, start_codon_index, stop_codon_index)
     print(gene_features)

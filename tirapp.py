@@ -16,7 +16,7 @@ def main():
   stop_codons = st.text_input("Enter the stop codons:")
 
   if st.button("Calculate features"):
-    #start_codon_index = int(start_codon)
+    start_codon_index = int(start_codon)
 
     gene_features = features.features(gene_sequence, start_codon, stop_codons)
     df = pd.DataFrame(gene_features, index=["Value"])

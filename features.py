@@ -20,7 +20,7 @@ def features(gene_sequence, start_codon, stop_codons):
     if stop_codon == -1:
         raise ValueError("No stop codon found in gene sequence")
 
-    cds_sequence = gene_sequence[start_codon:stop_codon + 3]
+    cds_sequence = gene_sequence[start_codon:]
 
     folding_energy_80 = calculate_folding_energy_80(gene_sequence,start_codon)
     folding_energy_70 = calculate_folding_energy_70(gene_sequence)

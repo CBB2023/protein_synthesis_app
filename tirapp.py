@@ -18,7 +18,7 @@ def main():
   if st.button("Calculate features"):
     start_codon_index = int(start_codon)
 
-    gene_features = features.features(gene_sequence, start_codon, stop_codons)
+    gene_features = features.features(gene_sequence, int(start_codon), stop_codons)
     df = pd.DataFrame(gene_features, index=["Value"])
     st.subheader("Calculated Features:")
     st.write(df)

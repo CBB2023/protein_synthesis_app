@@ -60,7 +60,7 @@ def main():
 
         # Evaluate Random Forest Model
         rf_y_pred = evaluate_model(rf_model, df)
-    print(rf_y_pred)
+        print(rf_y_pred)
 """
         # Create a DataFrame with predictions
         df_predictions = pd.DataFrame({

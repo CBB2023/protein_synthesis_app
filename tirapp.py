@@ -68,7 +68,7 @@ def main():
 """
         # Provide a download link for predictions
         #csv = df_predictions.to_csv(index=False)
-        st.write(rf_y_pred)
+    st.write(rf_y_pred)
         """
         b64 = base64.b64encode(csv.encode()).decode()  # Convert DataFrame to base64 encoding
         href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'

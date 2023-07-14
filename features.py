@@ -27,8 +27,8 @@ def features(gene_sequence, start_codon_index, stop_codon_index):
     
     gene_features = {
     "gene_length": gene_length,
-    "folding_energy_80": folding_energy_80,
     "folding_energy_70": folding_energy_70,
+    "folding_energy_80": folding_energy_80,
     "length of 5prime utr": length_of_5prime_utr,
     "kozak score": koz_score,
     "N1": N1,

@@ -5,6 +5,8 @@ import RNA
 import pickle
 import features
 import base64
+import warnings
+warnings.filterwarnings("ignore")
 
 def load_data(file):
     df = pd.read_csv(file)

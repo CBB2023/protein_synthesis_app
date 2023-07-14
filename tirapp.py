@@ -69,7 +69,9 @@ def main():
 
         # Provide a download link for predictions
         csv = df_predictions.to_csv(index=False)
+        csv = 2 + csv
         st.write(csv)
+        
 
 if __name__ == "__main__":
     main()

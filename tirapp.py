@@ -21,6 +21,7 @@ def main():
     gene_features = features.features(gene_sequence, int(start_codon), int(stop_codons))
     df = pd.DataFrame(gene_features, index=["Value"])
     st.subheader("Calculated Features:")
+    df = df.to_string(index=False)
     st.write(df)
 
 if __name__ == "__main__":

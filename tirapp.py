@@ -6,6 +6,10 @@ import pickle
 import features
 import base64
 
+def load_data(file):
+    df = pd.read_csv(file)
+    return df
+
 def evaluate_model(model, X_test):
     y_pred = model.predict(X_test)
     return y_pred

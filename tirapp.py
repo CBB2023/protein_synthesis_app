@@ -60,15 +60,15 @@ def main():
 
         # Evaluate Random Forest Model
         rf_y_pred = evaluate_model(rf_model, df)
-
+"""
         # Create a DataFrame with predictions
         df_predictions = pd.DataFrame({
             'Random Forest Predictions': rf_y_pred,
         })
-
+"""
         # Provide a download link for predictions
-        csv = df_predictions.to_csv(index=False)
-        st.write(csv)
+        #csv = df_predictions.to_csv(index=False)
+        st.write(rf_y_pred)
         """
         b64 = base64.b64encode(csv.encode()).decode()  # Convert DataFrame to base64 encoding
         href = f'<a href="data:file/csv;base64,{b64}" download="predictions.csv">Download Predictions</a>'

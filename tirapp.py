@@ -60,8 +60,8 @@ def main():
 
         # Evaluate Random Forest Model
         rf_y_pred = evaluate_model(rf_model, df)
-        st.write(rf_y_pred)
-"""
+        #st.write(rf_y_pred)
+
         # Create a DataFrame with predictions
         df_predictions = pd.DataFrame({
             'Random Forest Predictions': rf_y_pred,
@@ -70,6 +70,6 @@ def main():
         # Provide a download link for predictions
         csv = df_predictions.to_csv(index=False)
         st.write(csv)
-"""
+
 if __name__ == "__main__":
     main()

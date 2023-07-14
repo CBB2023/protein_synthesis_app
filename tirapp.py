@@ -52,26 +52,16 @@ def main():
     if st.button("Start Prediction"):  
         # Load Models
         rf_model_path = "tir_rf_model.pkl"
-        xgb_model_path = "tir_xgb_model.pkl"
 
         with open(rf_model_path, 'rb') as f:
             rf_model = pickle.load(f)
 
-        with open(xgb_model_path, 'rb') as f:
-            xgb_model = pickle.load(f)
-
         # Evaluate Random Forest Model
         rf_y_pred = evaluate_model(rf_model, df)
-
-
-        # Evaluate XGBoost Model
-        xgb_y_pred = evaluate_model(xgb_model, df)
-
 
         # Create a DataFrame with predictions
         df_predictions = pd.DataFrame({
             'Random Forest Predictions': rf_y_pred,
-            'XGBoost Predictions': xgb_y_pred
         })
 
         # Provide a download link for predictions

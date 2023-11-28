@@ -64,7 +64,7 @@ def main():
     st.title("Gene Optimization")
     
     target_initiation_rate = st.number_input("Target Initiation Rate:", min_value=0.0, value=0.8, step=0.01)
-    iterations = st.number_input("Enter the target initiation rate:", min_value=1, value=100, step=1)
+    iterations = st.number_input("Enter the number of iterations:", min_value=1, value=100, step=1)
 
     method_options = ["Optimization with UTR", "Optimization with UTR and codon"]
     selected_method = st.selectbox("Choose a method", method_options)

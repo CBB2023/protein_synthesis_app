@@ -19,13 +19,22 @@ Translation initiation, which is the rate-limiting step in protein synthesis, ca
 Multiple molecular factors, such as mRNA structure stability, coding sequence length, and specific motifs in mRNA, influence the translation initiation rate, 
 allowing precise control of protein synthesis. Despite the crucial role of translation initiation rate, accurately predicting its absolute values based on mRNA 
 sequence features remains challenging. To address this issue, we developed a machine learning model specifically trained to predict the in vivo 
-initiation rate in S. cerevisiae transcripts. This has been developed on python 3.9 
+initiation rate in S. cerevisiae transcripts. 
+
+Further using this app the user can optimize the gene and achieve their desired target initiation rate using 2 methods:
+1. Optimization with UTR
+2. Optimization with UTR and codon
+
+This has been developed on python 3.9 
 
 ### How to use:
 
-1. Upload your input file with specified features as in "Example file".
-2. Click on the "Start Prediction" to initiate the analysis.
-3. After completion download the output file by clicking "Download Predictions".
+1. Enter the CDS sequence, start codon and stop codon sites. 
+2. Click on the "Calculate Features & Predict Initiation rate" to initiate the analysis.
+3. If you want to optimize enter the target inititation rate.
+4. Enter how many time you want to iterate the process.
+5. Wait for the message "Optimization completed!"
+
 
 Note: The output file will contain the perdcited translation initiation rate of the input given for specific given genes.It works properly with one or more genes.
 
@@ -70,9 +79,6 @@ def main():
             
         print(opt)
         st.success("Optimization completed!")
-     
-        
-
     
     
 

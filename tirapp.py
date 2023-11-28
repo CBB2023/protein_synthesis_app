@@ -1,78 +1,80 @@
-import streamlit as st
 import numpy as np
 import pandas as pd
-import RNA
-import pickle
-import features
-import base64
+import streamlit as st
+import random
+import features,InitiationRate
+import OptimizationUTRcodon, OptimizationUTR
 import warnings
 warnings.filterwarnings("ignore")
 
-def load_data(file):
-    df = pd.read_csv(file)
-    return df
+# Page title
+st.markdown("""
+# TIR Predictor 
 
-def evaluate_model(model, X_test):
-    y_pred = model.predict(X_test)
-    return y_pred
+This allows user to predict Translation Initation Rate in Saccharomyces cerevisiae using mRNA features using Machine Learning methods.
 
+### Introduction: 
+
+Translation initiation, which is the rate-limiting step in protein synthesis, can vary significantly and have a profound impact on cellular protein levels. 
+Multiple molecular factors, such as mRNA structure stability, coding sequence length, and specific motifs in mRNA, influence the translation initiation rate, 
+allowing precise control of protein synthesis. Despite the crucial role of translation initiation rate, accurately predicting its absolute values based on mRNA 
+sequence features remains challenging. To address this issue, we developed a machine learning model specifically trained to predict the in vivo 
+initiation rate in S. cerevisiae transcripts. This has been developed on python 3.9 
+
+### How to use:
+
+1. Upload your input file with specified features as in "Example file".
+2. Click on the "Start Prediction" to initiate the analysis.
+3. After completion download the output file by clicking "Download Predictions".
+
+Note: The output file will contain the perdcited translation initiation rate of the input given for specific given genes.It works properly with one or more genes.
+
+**Credits**
+- Built in `Python` + `Streamlit` by Sulagno Chakraborty, Inayat Ullah Irshad, Mahima and Ajeet K. Sharma
+[[Read the Paper]]().
+---
+""")
+
+# Streamlit web app
 def main():
+    st.title("Initiation rate Prediction")
+
+    # Input fields for gene sequence, start codon index, stop codon index, and target initiation rate
     gene_sequence = st.text_input("Enter the mRNA sequence:")
-    start_codon = st.text_input("Enter the start codon position:")
-    stop_codons = st.text_input("Enter the stop codons:")
+    start_codon_index = st.number_input("Start Codon Index:", min_value=1, value=18, step=1)
+    stop_codon_index = st.number_input("Stop Codon Index:", min_value=1, value=732, step=1)
 
-    if st.button("Calculate features"):
-        start_codon_index = int(start_codon)
-
-        gene_features = features.features(gene_sequence, int(start_codon), int(stop_codons))
-        data = pd.DataFrame(gene_features, index=["Value"])
-
-        st.subheader("Calculated Features:")
-        st.write(data.to_html(index=False), unsafe_allow_html=True)
-
-        # Download link for the DataFrame
-        csv = data.to_csv(index=False)
-        b64 = base64.b64encode(csv.encode()).decode()
-        href = f'<a href="data:file/csv;base64,{b64}" download="gene_features.csv">Download here</a>'
-        st.markdown(href, unsafe_allow_html=True)
-
-    # File Upload
-    file = st.file_uploader("Upload the file", type=["csv","xlsx"], key='file_uploader')
-    if not file:
-        st.warning("Please upload a file in excel or csv format")
-        return
-
-
-    # Load Data
-    df = load_data(file)
-    st.write("Data:")
-    st.write(df)
+    if st.button("Calculate Features & Predict Initiation rate"):
+        gene_features = features.features(gene_sequence, int(start_codon_index), int(stop_codon_index))
+        df = pd.DataFrame([gene_features], columns=["gene_length", "folding_energy_70", "folding_energy_80", "length_of_5prime_utr", "kozak_score", "N1", "N4", "in_frame AUG"])
+        st.write("The dataset of calculated features are as follows:")
+        st.dataframe(df)
+        rate = InitiationRate.InitiationRate(gene_sequence, int(start_codon_index), int(stop_codon_index))
+        st.write("The Translation Initiation rate predicted is:", rate)
     
+    st.title("Gene Optimization")
+    
+    target_initiation_rate = st.number_input("Target Initiation Rate:", min_value=0.0, value=0.8, step=0.01)
+    iterations = st.number_input("Enter the target initiation rate:", min_value=1, value=100, step=1)
+
+    method_options = ["Optimization with UTR", "Optimization with UTR and codon"]
+    selected_method = st.selectbox("Choose a method", method_options)
     
 
-    # Start Prediction Button
-    if st.button("Predict translation initiation rate"):  
-        # Load Models
-        rf_model_path = "tir_rf_model.pkl"
+    if st.button("Optimize"):
+        if selected_method == "Optimization with UTR":
+            opt = OptimizationUTRcodon.OptimizationUTRcodon(gene_sequence, start_codon_index, stop_codon_index, target_initiation_rate, iterations)
+        elif selected_method == "Optimization with UTR and codon":
+            opt = OptimizationUTR.OptimizationUTR(gene_sequence, start_codon_index, stop_codon_index, target_initiation_rate, iterations)
+            
+            
+        print(opt)
+        st.success("Optimization completed!")
+     
+        
 
-        with open(rf_model_path, 'rb') as f:
-            rf_model = pickle.load(f)
-
-        # Evaluate Random Forest Model
-        rf_y_pred = evaluate_model(rf_model, df)
-        rf_y_pred = 2 + rf_y_pred
-        st.write(rf_y_pred)
-"""
-        # Create a DataFrame with predictions
-        df_predictions = pd.DataFrame({
-            'Random Forest Predictions': rf_y_pred,
-        })
-
-        # Provide a download link for predictions
-        csv = df_predictions.to_csv(index=False)
-        csv = 2 + csv
-        st.write(csv)
- """       
+    
+    
 
 if __name__ == "__main__":
     main()
